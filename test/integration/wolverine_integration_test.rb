@@ -7,10 +7,10 @@ class WolverineIntegrationTest < MiniTest::Unit::TestCase
   def mock_redis
     stub.tap do |redis|
       redis.expects(:evalsha).
-        with('fe24f4dd4ba7881608cca4b846f009195e06d79a', 2, :a, :b).
+        with('fe24f4dd4ba7881608cca4b846f009195e06d79a', :a, :b).
         raises("NOSCRIPT").once
       redis.expects(:eval).
-        with(CONTENT, 2, :a, :b).
+        with(CONTENT, :a, :b).
         returns([1, 0]).once
     end
   end
@@ -20,6 +20,7 @@ class WolverineIntegrationTest < MiniTest::Unit::TestCase
     Wolverine.config.script_path = Pathname.new(File.expand_path('../lua', __FILE__))
 
     assert_equal [1, 0], Wolverine.util.mexists(:a, :b)
+    assert Wolverine.methods.include?(:util)
   end
 
   def test_everything_instantiated
@@ -28,6 +29,7 @@ class WolverineIntegrationTest < MiniTest::Unit::TestCase
 
     wolverine = Wolverine.new(config)
     assert_equal [1, 0], wolverine.util.mexists(:a, :b)
+    assert wolverine.methods.include?(:util)
   end
 
 end
